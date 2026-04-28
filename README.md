@@ -1,6 +1,6 @@
 # ejercicio-tecnico-backend-2
 
-Placeholder inicial del repositorio.
+Backend bancario en monorepo con dos microservicios Spring Boot.
 
 ## Contexto base
 
@@ -20,6 +20,135 @@ Placeholder inicial del repositorio.
 - Los commits deben ser extremadamente atómicos para facilitar revisión previa al merge.
 - Por cada commit se debe realizar su `push` correspondiente.
 
+## Arquitectura
+
+- El repositorio se organiza como monorepo con dos aplicaciones Spring Boot independientes:
+  - `customer-service`
+  - `account-service`
+- Cada servicio mantiene una estructura simple por capas:
+  - `api`
+  - `application`
+  - `domain`
+  - `infrastructure`
+- La explicación funcional y arquitectónica debe vivir en este `README.md`.
+- Los comentarios en código fuente deben usarse solo cuando mejoren legibilidad de un bloque que no se explique bien por nombres y estructura.
+
+## Estructura
+
+```text
+.
+├── .github/
+├── customer-service/
+└── account-service/
+```
+
+## Microservicios
+
+### customer-service
+
+- Responsable de `Persona` y `Cliente`.
+- Puerto por defecto: `8081`.
+- Base de datos por defecto: `customer_service`.
+- Variables de entorno:
+  - `CUSTOMER_SERVICE_PORT`
+  - `CUSTOMER_SERVICE_DB_URL`
+  - `CUSTOMER_SERVICE_DB_USERNAME`
+  - `CUSTOMER_SERVICE_DB_PASSWORD`
+- Endpoints:
+  - `GET /clientes`
+  - `GET /clientes/{id}`
+  - `POST /clientes`
+  - `PUT /clientes/{id}`
+  - `PATCH /clientes/{id}`
+  - `DELETE /clientes/{id}`
+
+### account-service
+
+- Responsable de `Cuenta` y `Movimiento`.
+- Puerto por defecto: `8082`.
+- Base de datos por defecto: `account_service`.
+- Variables de entorno:
+  - `ACCOUNT_SERVICE_PORT`
+  - `ACCOUNT_SERVICE_DB_URL`
+  - `ACCOUNT_SERVICE_DB_USERNAME`
+  - `ACCOUNT_SERVICE_DB_PASSWORD`
+- Endpoints de cuentas:
+  - `GET /cuentas`
+  - `GET /cuentas/{id}`
+  - `POST /cuentas`
+  - `PUT /cuentas/{id}`
+  - `PATCH /cuentas/{id}`
+  - `DELETE /cuentas/{id}`
+- Endpoints de movimientos:
+  - `GET /movimientos`
+  - `GET /movimientos/{id}`
+  - `POST /movimientos`
+  - `PUT /movimientos/{id}`
+  - `PATCH /movimientos/{id}`
+  - `DELETE /movimientos/{id}`
+
+## Modelo inicial
+
+### Persona
+
+- `id`
+- `name`
+- `gender`
+- `age`
+- `identification`
+- `address`
+- `phone`
+
+### Cliente
+
+- hereda de `Persona`
+- `customerId`
+- `password`
+- `status`
+
+### Cuenta
+
+- `id`
+- `accountNumber`
+- `accountType`
+- `initialBalance`
+- `status`
+
+### Movimiento
+
+- `id`
+- `movementDate`
+- `movementType`
+- `amount`
+- `balance`
+- `accountId`
+
+## Ejecución local
+
+### customer-service
+
+```powershell
+cd customer-service
+.\mvnw.cmd spring-boot:run
+```
+
+### account-service
+
+```powershell
+cd account-service
+.\mvnw.cmd spring-boot:run
+```
+
+## Validación local
+
+```powershell
+cd customer-service
+.\mvnw.cmd test
+
+cd ..\account-service
+.\mvnw.cmd test
+```
+
 ## CI
 
 - El pipeline de CI vive en `.github/workflows/ci.yml`.
@@ -33,6 +162,7 @@ Placeholder inicial del repositorio.
 - Cuando existan `customer-service` y `account-service`, el check `java-validation` ejecutará build y pruebas usando `mvnw` o `gradlew` por módulo.
 - Cuando existan Dockerfiles y `docker-compose.yml`, el check `container-validation` validará build de imágenes y sintaxis de compose.
 
-## Estado
+## Estado actual
 
-El repositorio queda preparado como línea base para iniciar la implementación.
+- Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
+- La primera funcionalidad implementada es el CRUD base para `clientes`, `cuentas` y `movimientos`.
