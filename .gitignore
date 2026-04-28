@@ -1,0 +1,25 @@
+# Entorno local de IA y documentacion operativa local
+.codex/
+openspec/
+
+# IDE
+.idea/
+.vscode/
+
+# Java / Spring Boot / Maven / Gradle
+target/
+build/
+out/
+.gradle/
+dependency-reduced-pom.xml
+
+# Logs y temporales
+logs/
+*.log
+tmp/
+temp/
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
