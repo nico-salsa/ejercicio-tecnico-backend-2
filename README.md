@@ -54,6 +54,13 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
   - `CUSTOMER_SERVICE_DB_URL`
   - `CUSTOMER_SERVICE_DB_USERNAME`
   - `CUSTOMER_SERVICE_DB_PASSWORD`
+- Endpoints:
+  - `GET /clientes`
+  - `GET /clientes/{id}`
+  - `POST /clientes`
+  - `PUT /clientes/{id}`
+  - `PATCH /clientes/{id}`
+  - `DELETE /clientes/{id}`
 
 ### account-service
 
@@ -65,6 +72,82 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
   - `ACCOUNT_SERVICE_DB_URL`
   - `ACCOUNT_SERVICE_DB_USERNAME`
   - `ACCOUNT_SERVICE_DB_PASSWORD`
+- Endpoints de cuentas:
+  - `GET /cuentas`
+  - `GET /cuentas/{id}`
+  - `POST /cuentas`
+  - `PUT /cuentas/{id}`
+  - `PATCH /cuentas/{id}`
+  - `DELETE /cuentas/{id}`
+- Endpoints de movimientos:
+  - `GET /movimientos`
+  - `GET /movimientos/{id}`
+  - `POST /movimientos`
+  - `PUT /movimientos/{id}`
+  - `PATCH /movimientos/{id}`
+  - `DELETE /movimientos/{id}`
+
+## Modelo inicial
+
+### Persona
+
+- `id`
+- `name`
+- `gender`
+- `age`
+- `identification`
+- `address`
+- `phone`
+
+### Cliente
+
+- hereda de `Persona`
+- `customerId`
+- `password`
+- `status`
+
+### Cuenta
+
+- `id`
+- `accountNumber`
+- `accountType`
+- `initialBalance`
+- `status`
+
+### Movimiento
+
+- `id`
+- `movementDate`
+- `movementType`
+- `amount`
+- `balance`
+- `accountId`
+
+## Ejecución local
+
+### customer-service
+
+```powershell
+cd customer-service
+.\mvnw.cmd spring-boot:run
+```
+
+### account-service
+
+```powershell
+cd account-service
+.\mvnw.cmd spring-boot:run
+```
+
+## Validación local
+
+```powershell
+cd customer-service
+.\mvnw.cmd test
+
+cd ..\account-service
+.\mvnw.cmd test
+```
 
 ## CI
 
@@ -82,4 +165,4 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
 ## Estado actual
 
 - Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
-- La primera funcionalidad en implementación es el CRUD base para `clientes`, `cuentas` y `movimientos`.
+- La primera funcionalidad implementada es el CRUD base para `clientes`, `cuentas` y `movimientos`.
