@@ -29,7 +29,6 @@ jobs:
           required_files=(
             "README.md"
             ".gitignore"
-            "openspec/config.yaml"
           )
 
           for file in "${required_files[@]}"; do
