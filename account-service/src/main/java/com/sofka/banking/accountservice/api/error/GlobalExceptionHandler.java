@@ -1,5 +1,6 @@
 package com.sofka.banking.accountservice.api.error;
 
+import com.sofka.banking.accountservice.domain.exception.InsufficientBalanceException;
 import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -18,6 +19,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException exception) {
         return buildResponse(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", exception.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ApiError> handleInsufficientBalance(InsufficientBalanceException exception) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "INSUFFICIENT_BALANCE", exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

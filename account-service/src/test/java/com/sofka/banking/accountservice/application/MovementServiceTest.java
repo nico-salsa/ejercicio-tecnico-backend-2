@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sofka.banking.accountservice.api.dto.MovementCreateRequest;
 import com.sofka.banking.accountservice.api.dto.MovementPatchRequest;
 import com.sofka.banking.accountservice.api.dto.MovementUpdateRequest;
+import com.sofka.banking.accountservice.domain.exception.InsufficientBalanceException;
 import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundException;
 import com.sofka.banking.accountservice.domain.model.Account;
 import com.sofka.banking.accountservice.domain.model.Movement;
@@ -77,7 +79,8 @@ class MovementServiceTest {
             savedMovement.set(persistedMovement);
             return persistedMovement;
         });
-        when(movementRepository.findByAccountIdOrderByMovementDateAscIdAsc(1L)).thenAnswer(invocation -> List.of(savedMovement.get()));
+        when(movementRepository.findByAccountIdOrderByMovementDateAscIdAsc(1L)).thenAnswer(invocation ->
+                savedMovement.get() == null ? List.of() : List.of(savedMovement.get()));
         when(movementRepository.saveAll(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(accountService.persist(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -144,6 +147,42 @@ class MovementServiceTest {
         assertThat(response.accountNumber()).isEqualTo("225487");
         assertThat(account.getAvailableBalance()).isEqualByComparingTo("2000.00");
         assertThat(anotherAccount.getAvailableBalance()).isEqualByComparingTo("300.00");
+    }
+
+    @Test
+    void shouldRejectMovementWhenBalanceWouldBeNegative() {
+        MovementCreateRequest request = new MovementCreateRequest(
+                LocalDateTime.of(2026, 4, 29, 9, 0),
+                "RETIRO",
+                new BigDecimal("-2500.00"),
+                1L
+        );
+
+        when(accountService.loadAccount(1L)).thenReturn(account);
+        when(movementRepository.findByAccountIdOrderByMovementDateAscIdAsc(1L)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> movementService.create(request))
+                .isInstanceOf(InsufficientBalanceException.class)
+                .hasMessage("Saldo no disponible");
+
+        verify(movementRepository, never()).save(any(Movement.class));
+    }
+
+    @Test
+    void shouldRejectPatchWhenBalanceWouldBeNegative() {
+        when(movementRepository.findById(1L)).thenReturn(Optional.of(movement));
+        when(movementRepository.findByAccountIdOrderByMovementDateAscIdAsc(1L)).thenReturn(List.of(movement));
+
+        assertThatThrownBy(() -> movementService.patch(1L, new MovementPatchRequest(
+                null,
+                null,
+                new BigDecimal("-2500.00"),
+                null
+        )))
+                .isInstanceOf(InsufficientBalanceException.class)
+                .hasMessage("Saldo no disponible");
+
+        verify(movementRepository, never()).save(any(Movement.class));
     }
 
     @Test

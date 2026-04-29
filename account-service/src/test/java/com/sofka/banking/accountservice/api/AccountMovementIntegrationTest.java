@@ -200,4 +200,115 @@ class AccountMovementIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("RESOURCE_NOT_FOUND"));
     }
+
+    @Test
+    void shouldRejectMovementWhenInsufficientBalance() throws Exception {
+        String accountBody = """
+                {
+                  "accountNumber": "585545",
+                  "accountType": "Corriente",
+                  "initialBalance": 100.00,
+                  "status": true
+                }
+                """;
+
+        String accountResponse = mockMvc.perform(post("/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(accountBody))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long accountId = Long.valueOf(accountResponse.replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        String movementBody = """
+                {
+                  "movementDate": "2026-04-29T10:00:00",
+                  "movementType": "RETIRO",
+                  "amount": -150.00,
+                  "accountId": %d
+                }
+                """.formatted(accountId);
+
+        mockMvc.perform(post("/movimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(movementBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Saldo no disponible"))
+                .andExpect(jsonPath("$.error").value("INSUFFICIENT_BALANCE"))
+                .andExpect(jsonPath("$.status").value(400));
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBalance").value(100.0));
+
+        mockMvc.perform(get("/movimientos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void shouldRejectMovementPatchWhenInsufficientBalance() throws Exception {
+        String accountBody = """
+                {
+                  "accountNumber": "225487",
+                  "accountType": "Corriente",
+                  "initialBalance": 100.00,
+                  "status": true
+                }
+                """;
+
+        String accountResponse = mockMvc.perform(post("/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(accountBody))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long accountId = Long.valueOf(accountResponse.replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        String movementBody = """
+                {
+                  "movementDate": "2026-04-29T09:30:00",
+                  "movementType": "DEPOSITO",
+                  "amount": 50.00,
+                  "accountId": %d
+                }
+                """.formatted(accountId);
+
+        String movementResponse = mockMvc.perform(post("/movimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(movementBody))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long movementId = Long.valueOf(movementResponse.replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        String patchBody = """
+                {
+                  "amount": -150.00
+                }
+                """;
+
+        mockMvc.perform(patch("/movimientos/{id}", movementId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(patchBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Saldo no disponible"))
+                .andExpect(jsonPath("$.error").value("INSUFFICIENT_BALANCE"))
+                .andExpect(jsonPath("$.status").value(400));
+
+        mockMvc.perform(get("/movimientos/{id}", movementId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(50.0))
+                .andExpect(jsonPath("$.balance").value(150.0));
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBalance").value(150.0));
+    }
 }
