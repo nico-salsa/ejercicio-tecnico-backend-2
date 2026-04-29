@@ -1,0 +1,14 @@
+$kind: http-request
+name: 'Patch Movement (Partial)'
+method: PATCH
+url: '{{accountServiceUrl}}/movimientos/{{movementId}}'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": -100.00
+    }

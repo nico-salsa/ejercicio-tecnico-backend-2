@@ -1,0 +1,17 @@
+$kind: http-request
+name: 'Update Account (Full)'
+method: PUT
+url: '{{accountServiceUrl}}/cuentas/{{accountId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "accountNumber": "478758",
+      "accountType": "Ahorro",
+      "initialBalance": 2000.00,
+      "status": true
+    }

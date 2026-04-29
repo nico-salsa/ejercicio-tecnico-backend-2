@@ -1,0 +1,12 @@
+$kind: collection
+name: Customer Service
+description: CRUD operations for the Customer microservice (/clientes)
+variables:
+  - key: customerServiceUrl
+    value: 'http://localhost:8081'
+    type: default
+    enabled: true
+  - key: customerResourceId
+    value: '1'
+    type: default
+    enabled: true

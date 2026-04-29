@@ -1,6 +1,7 @@
 # Entorno local de IA y documentacion operativa local
 .codex/
 openspec/
+.postman/
 
 # IDE
 .idea/

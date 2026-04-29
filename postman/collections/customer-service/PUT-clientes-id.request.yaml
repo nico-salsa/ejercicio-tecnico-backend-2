@@ -1,0 +1,22 @@
+$kind: http-request
+name: 'Update Customer (Full)'
+method: PUT
+url: '{{customerServiceUrl}}/clientes/{{customerResourceId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Jose Lema",
+      "gender": "Masculino",
+      "age": 30,
+      "identification": "1234567890",
+      "address": "Otavalo sn y principal",
+      "phone": "098254785",
+      "customerId": "JL001",
+      "password": "1234",
+      "status": true
+    }
