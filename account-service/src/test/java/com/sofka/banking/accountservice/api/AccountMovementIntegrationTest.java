@@ -119,6 +119,66 @@ class AccountMovementIntegrationTest {
     }
 
     @Test
+    void shouldCoverF6WithEndToEndBankingFlow() throws Exception {
+        String accountBody = """
+                {
+                  "accountNumber": "778899",
+                  "accountType": "Ahorro",
+                  "initialBalance": 350.00,
+                  "customerId": "JL001",
+                  "customerName": "Jose Lema",
+                  "status": true
+                }
+                """;
+
+        String accountResponse = mockMvc.perform(post("/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(accountBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountNumber").value("778899"))
+                .andExpect(jsonPath("$.availableBalance").value(350.0))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Long accountId = Long.valueOf(accountResponse.replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        String movementBody = """
+                {
+                  "movementDate": "2022-02-10T10:00:00",
+                  "movementType": "DEPOSITO",
+                  "amount": 150.00,
+                  "accountId": %d
+                }
+                """.formatted(accountId);
+
+        mockMvc.perform(post("/movimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(movementBody))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.accountId").value(accountId))
+                .andExpect(jsonPath("$.accountNumber").value("778899"))
+                .andExpect(jsonPath("$.movementType").value("DEPOSITO"))
+                .andExpect(jsonPath("$.amount").value(150.0))
+                .andExpect(jsonPath("$.balance").value(500.0));
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountNumber").value("778899"))
+                .andExpect(jsonPath("$.availableBalance").value(500.0));
+
+        mockMvc.perform(get("/reportes")
+                        .param("clienteId", "JL001")
+                        .param("fechaInicio", "2022-02-01")
+                        .param("fechaFin", "2022-02-10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].cliente").value("Jose Lema"))
+                .andExpect(jsonPath("$[0].numeroCuenta").value("778899"))
+                .andExpect(jsonPath("$[0].movimiento").value(150.0))
+                .andExpect(jsonPath("$[0].saldoDisponible").value(500.0));
+    }
+
+    @Test
     void shouldUpdatePatchAndDeleteAccountAndMovement() throws Exception {
         String accountBody = """
                 {

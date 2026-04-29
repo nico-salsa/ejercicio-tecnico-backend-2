@@ -177,6 +177,8 @@ cd ..\account-service
   - `customer-service/target/site/jacoco/index.html`
   - `account-service/target/site/jacoco/index.html`
 
+La evidencia automatizada de F6 en `account-service` es la prueba `shouldCoverF6WithEndToEndBankingFlow`, que valida por HTTP la creacion de cuenta, el registro de movimiento y la verificacion del resultado observable final.
+
 ## Postman
 
 - La colección editable del proyecto vive en `postman/`.
