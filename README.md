@@ -143,10 +143,10 @@ cd account-service
 
 ```powershell
 cd customer-service
-.\mvnw.cmd test
+.\mvnw.cmd verify
 
 cd ..\account-service
-.\mvnw.cmd test
+.\mvnw.cmd verify
 ```
 
 ## CI
@@ -158,11 +158,24 @@ cd ..\account-service
   - `container-validation`
 - El workflow corre en `pull_request` hacia `develop` y `main`.
 - El workflow corre en `push` sobre `feature/*`, `develop` y `main`.
-- En el estado actual del repositorio, `java-validation` y `container-validation` están diseñados para omitir su ejecución de build si todavía no existen módulos Java, Dockerfiles o `docker-compose.yml`.
-- Cuando existan `customer-service` y `account-service`, el check `java-validation` ejecutará build y pruebas usando `mvnw` o `gradlew` por módulo.
+- En el estado actual del repositorio, `container-validation` está diseñado para omitir su ejecución si todavía no existen Dockerfiles o `docker-compose.yml`.
+- El check `java-validation` ejecuta `./mvnw -B verify` por módulo.
+- `verify` compila, ejecuta pruebas unitarias e integración y valida cobertura con JaCoCo.
+- Cada microservicio exige una cobertura mínima de líneas superior al 80%.
+- Si falla alguna prueba o la cobertura queda por debajo del umbral, el pipeline falla.
 - Cuando existan Dockerfiles y `docker-compose.yml`, el check `container-validation` validará build de imágenes y sintaxis de compose.
+
+## Pruebas y cobertura
+
+- `customer-service` incluye pruebas unitarias de servicio y pruebas de integración HTTP/JPA para `/clientes`.
+- `account-service` incluye pruebas unitarias de servicio y pruebas de integración HTTP/JPA para `/cuentas` y `/movimientos`.
+- Ambos módulos validan escenarios felices y no felices de recurso inexistente, payload inválido y manejo de errores.
+- Los reportes HTML de cobertura se generan en:
+  - `customer-service/target/site/jacoco/index.html`
+  - `account-service/target/site/jacoco/index.html`
 
 ## Estado actual
 
 - Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
 - La primera funcionalidad implementada es el CRUD base para `clientes`, `cuentas` y `movimientos`.
+- El repositorio ya exige pruebas automatizadas y cobertura mínima por módulo para sostener la calidad del backend.
