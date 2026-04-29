@@ -196,6 +196,15 @@ cd ..\account-service
   - `GET|POST|PUT|PATCH|DELETE /cuentas`
   - `GET|POST|PUT|PATCH|DELETE /movimientos`
 
+## Movimientos y saldo
+
+- `account-service` calcula internamente el saldo resultante de cada movimiento.
+- Un valor positivo en `amount` representa un depósito.
+- Un valor negativo en `amount` representa un retiro.
+- La cuenta mantiene `availableBalance` como saldo disponible actual persistido.
+- Cada movimiento persiste su `balance` como saldo resultante posterior a la transacción.
+- El cliente ya no debe enviar `balance` como fuente de verdad para `POST /movimientos`.
+
 ## Estado actual
 
 - Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
