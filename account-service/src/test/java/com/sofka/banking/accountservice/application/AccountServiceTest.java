@@ -39,6 +39,8 @@ class AccountServiceTest {
         account.setAccountType("Ahorro");
         account.setInitialBalance(new BigDecimal("2000.00"));
         account.setAvailableBalance(new BigDecimal("2000.00"));
+        account.setCustomerId("JL001");
+        account.setCustomerName("Jose Lema");
         account.setStatus(true);
     }
 
@@ -48,6 +50,8 @@ class AccountServiceTest {
                 "478758",
                 "Ahorro",
                 new BigDecimal("2000.00"),
+                "JL001",
+                "Jose Lema",
                 true
         );
 
@@ -58,6 +62,8 @@ class AccountServiceTest {
         assertThat(response.accountNumber()).isEqualTo("478758");
         assertThat(response.initialBalance()).isEqualByComparingTo("2000.00");
         assertThat(response.availableBalance()).isEqualByComparingTo("2000.00");
+        assertThat(response.customerId()).isEqualTo("JL001");
+        assertThat(response.customerName()).isEqualTo("Jose Lema");
     }
 
     @Test
@@ -66,6 +72,8 @@ class AccountServiceTest {
         when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = accountService.patch(1L, new AccountPatchRequest(
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -84,6 +92,8 @@ class AccountServiceTest {
                 "585545",
                 "Corriente",
                 new BigDecimal("1000.00"),
+                "JL001",
+                "Jose Lema",
                 true
         ));
 
@@ -91,6 +101,7 @@ class AccountServiceTest {
         assertThat(response.accountType()).isEqualTo("Corriente");
         assertThat(response.initialBalance()).isEqualByComparingTo("1000.00");
         assertThat(response.availableBalance()).isEqualByComparingTo("1000.00");
+        assertThat(response.customerId()).isEqualTo("JL001");
     }
 
     @Test
@@ -110,6 +121,7 @@ class AccountServiceTest {
 
         assertThat(response).hasSize(1);
         assertThat(response.get(0).accountNumber()).isEqualTo("478758");
+        assertThat(response.get(0).customerName()).isEqualTo("Jose Lema");
     }
 
     @Test

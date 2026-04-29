@@ -44,6 +44,8 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "478758",
                   "accountType": "Ahorro",
                   "initialBalance": 2000.00,
+                  "customerId": "JL001",
+                  "customerName": "Jose Lema",
                   "status": true
                 }
                 """;
@@ -53,6 +55,8 @@ class AccountMovementIntegrationTest {
                         .content(accountBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountNumber").value("478758"))
+                .andExpect(jsonPath("$.customerId").value("JL001"))
+                .andExpect(jsonPath("$.customerName").value("Jose Lema"))
                 .andExpect(jsonPath("$.availableBalance").value(2000.0))
                 .andReturn()
                 .getResponse()
@@ -101,6 +105,8 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "",
                   "accountType": "",
                   "initialBalance": -1,
+                  "customerId": "",
+                  "customerName": "",
                   "status": true
                 }
                 """;
@@ -119,6 +125,8 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "496825",
                   "accountType": "Ahorros",
                   "initialBalance": 540.00,
+                  "customerId": "MM001",
+                  "customerName": "Marianela Montalvo",
                   "status": true
                 }
                 """;
@@ -138,6 +146,8 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "496825",
                   "accountType": "Corriente",
                   "initialBalance": 640.00,
+                  "customerId": "MM001",
+                  "customerName": "Marianela Montalvo",
                   "status": true
                 }
                 """;
@@ -208,6 +218,8 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "585545",
                   "accountType": "Corriente",
                   "initialBalance": 100.00,
+                  "customerId": "JL001",
+                  "customerName": "Jose Lema",
                   "status": true
                 }
                 """;
@@ -255,10 +267,11 @@ class AccountMovementIntegrationTest {
                   "accountNumber": "225487",
                   "accountType": "Corriente",
                   "initialBalance": 100.00,
+                  "customerId": "MM001",
+                  "customerName": "Marianela Montalvo",
                   "status": true
                 }
                 """;
-
         String accountResponse = mockMvc.perform(post("/cuentas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(accountBody))
@@ -310,5 +323,108 @@ class AccountMovementIntegrationTest {
         mockMvc.perform(get("/cuentas/{id}", accountId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.availableBalance").value(150.0));
+    }
+
+    @Test
+    void shouldReturnAccountStatementReportByCustomerAndDates() throws Exception {
+        String savingsAccount = """
+                {
+                  "accountNumber": "225487",
+                  "accountType": "Corriente",
+                  "initialBalance": 100.00,
+                  "customerId": "MM001",
+                  "customerName": "Marianela Montalvo",
+                  "status": true
+                }
+                """;
+
+        String secondaryAccount = """
+                {
+                  "accountNumber": "496825",
+                  "accountType": "Ahorros",
+                  "initialBalance": 540.00,
+                  "customerId": "MM001",
+                  "customerName": "Marianela Montalvo",
+                  "status": true
+                }
+                """;
+
+        Long firstAccountId = Long.valueOf(mockMvc.perform(post("/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(savingsAccount))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                .replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        Long secondAccountId = Long.valueOf(mockMvc.perform(post("/cuentas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(secondaryAccount))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                .replaceAll(".*\"id\":(\\d+).*", "$1"));
+
+        mockMvc.perform(post("/movimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "movementDate": "2022-02-10T10:00:00",
+                                  "movementType": "DEPOSITO",
+                                  "amount": 600.00,
+                                  "accountId": %d
+                                }
+                                """.formatted(firstAccountId)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/movimientos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "movementDate": "2022-02-08T09:00:00",
+                                  "movementType": "RETIRO",
+                                  "amount": -540.00,
+                                  "accountId": %d
+                                }
+                                """.formatted(secondAccountId)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/reportes")
+                        .param("clienteId", "MM001")
+                        .param("fechaInicio", "2022-02-01")
+                        .param("fechaFin", "2022-02-10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].cliente").value("Marianela Montalvo"))
+                .andExpect(jsonPath("$[0].numeroCuenta").value("225487"))
+                .andExpect(jsonPath("$[0].tipo").value("Corriente"))
+                .andExpect(jsonPath("$[0].saldoInicial").value(100.0))
+                .andExpect(jsonPath("$[0].estado").value(true))
+                .andExpect(jsonPath("$[0].movimiento").value(600.0))
+                .andExpect(jsonPath("$[0].saldoDisponible").value(700.0))
+                .andExpect(jsonPath("$[1].numeroCuenta").value("496825"))
+                .andExpect(jsonPath("$[1].movimiento").value(-540.0))
+                .andExpect(jsonPath("$[1].saldoDisponible").value(0.0));
+    }
+
+    @Test
+    void shouldReturnEmptyReportWhenCustomerHasNoMovementsInRange() throws Exception {
+        mockMvc.perform(get("/reportes")
+                        .param("clienteId", "MM001")
+                        .param("fechaInicio", "2022-02-01")
+                        .param("fechaFin", "2022-02-10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidReportDateRange() throws Exception {
+        mockMvc.perform(get("/reportes")
+                        .param("clienteId", "MM001")
+                        .param("fechaInicio", "2022-02-11")
+                        .param("fechaFin", "2022-02-10"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("REPORT_QUERY_INVALID"));
     }
 }

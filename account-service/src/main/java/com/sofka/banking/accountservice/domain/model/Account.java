@@ -32,6 +32,12 @@ public class Account {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal availableBalance;
 
+    @Column(nullable = false, length = 50)
+    private String customerId;
+
+    @Column(nullable = false, length = 120)
+    private String customerName;
+
     @Column(nullable = false)
     private Boolean status;
 
@@ -72,6 +78,22 @@ public class Account {
 
     public void setAvailableBalance(BigDecimal availableBalance) {
         this.availableBalance = availableBalance;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public Boolean getStatus() {
