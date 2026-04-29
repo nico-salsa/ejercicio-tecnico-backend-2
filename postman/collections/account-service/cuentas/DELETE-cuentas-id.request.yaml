@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete Account
+method: DELETE
+url: '{{accountServiceUrl}}/cuentas/{{accountId}}'
+order: 6000

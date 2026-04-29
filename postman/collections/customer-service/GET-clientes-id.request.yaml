@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get Customer by ID
+method: GET
+url: '{{customerServiceUrl}}/clientes/{{customerResourceId}}'
+order: 2000

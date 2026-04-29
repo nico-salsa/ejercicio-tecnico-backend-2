@@ -1,0 +1,22 @@
+name: Local
+values:
+  - key: customerServiceUrl
+    value: 'http://localhost:8081'
+    enabled: true
+    type: default
+  - key: accountServiceUrl
+    value: 'http://localhost:8082'
+    enabled: true
+    type: default
+  - key: customerResourceId
+    value: '1'
+    enabled: true
+    type: default
+  - key: accountId
+    value: '1'
+    enabled: true
+    type: default
+  - key: movementId
+    value: '1'
+    enabled: true
+    type: default

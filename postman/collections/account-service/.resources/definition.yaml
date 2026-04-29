@@ -1,0 +1,10 @@
+$kind: collection
+name: Account Service
+description: CRUD operations for the Account microservice (/cuentas and /movimientos)
+variables:
+  - key: accountServiceUrl
+    value: 'http://localhost:8082'
+  - key: accountId
+    value: '1'
+  - key: movementId
+    value: '1'

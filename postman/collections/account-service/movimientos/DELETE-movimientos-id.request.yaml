@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete Movement
+method: DELETE
+url: '{{accountServiceUrl}}/movimientos/{{movementId}}'
+order: 6000

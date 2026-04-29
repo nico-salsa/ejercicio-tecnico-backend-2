@@ -174,6 +174,28 @@ cd ..\account-service
   - `customer-service/target/site/jacoco/index.html`
   - `account-service/target/site/jacoco/index.html`
 
+## Postman
+
+- La colección editable del proyecto vive en `postman/`.
+- `.postman/` es metadata local del cliente de Postman y no forma parte del entregable del repositorio.
+- El environment local base es `postman/environments/local.environment.yaml`.
+- Variables principales:
+  - `customerServiceUrl`: `http://localhost:8081`
+  - `accountServiceUrl`: `http://localhost:8082`
+  - `customerResourceId`: id numérico interno de `/clientes/{id}`
+  - `accountId`: id numérico interno de `/cuentas/{id}`
+  - `movementId`: id numérico interno de `/movimientos/{id}`
+- `customerResourceId` no es lo mismo que el campo de negocio `customerId`.
+- Flujo recomendado de prueba manual:
+  - ejecutar `POST /clientes` y copiar el `id` devuelto en `customerResourceId`
+  - ejecutar `POST /cuentas` y copiar el `id` devuelto en `accountId`
+  - ejecutar `POST /movimientos` usando ese `accountId`
+  - usar luego los requests `GET`, `PUT`, `PATCH` y `DELETE` sobre esos ids
+- La colección actual está alineada con los endpoints reales implementados:
+  - `GET|POST|PUT|PATCH|DELETE /clientes`
+  - `GET|POST|PUT|PATCH|DELETE /cuentas`
+  - `GET|POST|PUT|PATCH|DELETE /movimientos`
+
 ## Estado actual
 
 - Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
