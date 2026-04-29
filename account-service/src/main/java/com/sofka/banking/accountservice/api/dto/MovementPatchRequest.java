@@ -8,7 +8,6 @@ public record MovementPatchRequest(
         LocalDateTime movementDate,
         @Size(max = 40) String movementType,
         BigDecimal amount,
-        BigDecimal balance,
         Long accountId
 ) {
 }

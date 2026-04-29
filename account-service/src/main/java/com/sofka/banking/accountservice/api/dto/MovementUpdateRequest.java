@@ -10,7 +10,6 @@ public record MovementUpdateRequest(
         @NotNull LocalDateTime movementDate,
         @NotBlank @Size(max = 40) String movementType,
         @NotNull BigDecimal amount,
-        @NotNull BigDecimal balance,
         @NotNull Long accountId
 ) {
 }

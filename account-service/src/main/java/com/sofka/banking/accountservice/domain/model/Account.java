@@ -29,6 +29,9 @@ public class Account {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal initialBalance;
 
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal availableBalance;
+
     @Column(nullable = false)
     private Boolean status;
 
@@ -61,6 +64,14 @@ public class Account {
 
     public void setInitialBalance(BigDecimal initialBalance) {
         this.initialBalance = initialBalance;
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+
+    public void setAvailableBalance(BigDecimal availableBalance) {
+        this.availableBalance = availableBalance;
     }
 
     public Boolean getStatus() {

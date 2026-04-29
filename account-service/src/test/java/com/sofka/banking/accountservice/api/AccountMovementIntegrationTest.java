@@ -53,6 +53,7 @@ class AccountMovementIntegrationTest {
                         .content(accountBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountNumber").value("478758"))
+                .andExpect(jsonPath("$.availableBalance").value(2000.0))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -64,7 +65,6 @@ class AccountMovementIntegrationTest {
                   "movementDate": "2026-04-28T10:00:00",
                   "movementType": "DEPOSITO",
                   "amount": 500.00,
-                  "balance": 2500.00,
                   "accountId": %d
                 }
                 """.formatted(accountId);
@@ -74,7 +74,13 @@ class AccountMovementIntegrationTest {
                         .content(movementBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountId").value(accountId))
-                .andExpect(jsonPath("$.accountNumber").value("478758"));
+                .andExpect(jsonPath("$.accountNumber").value("478758"))
+                .andExpect(jsonPath("$.movementType").value("DEPOSITO"))
+                .andExpect(jsonPath("$.balance").value(2500.0));
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBalance").value(2500.0));
 
         mockMvc.perform(get("/movimientos"))
                 .andExpect(status().isOk())
@@ -141,14 +147,14 @@ class AccountMovementIntegrationTest {
                         .content(updateAccountBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountType").value("Corriente"))
-                .andExpect(jsonPath("$.initialBalance").value(640.0));
+                .andExpect(jsonPath("$.initialBalance").value(640.0))
+                .andExpect(jsonPath("$.availableBalance").value(640.0));
 
         String movementBody = """
                 {
                   "movementDate": "2026-04-28T15:00:00",
                   "movementType": "RETIRO",
                   "amount": -140.00,
-                  "balance": 500.00,
                   "accountId": %d
                 }
                 """.formatted(accountId);
@@ -165,8 +171,7 @@ class AccountMovementIntegrationTest {
 
         String patchMovementBody = """
                 {
-                  "movementType": "AJUSTE",
-                  "balance": 520.00
+                  "amount": 40.00
                 }
                 """;
 
@@ -174,11 +179,19 @@ class AccountMovementIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(patchMovementBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.movementType").value("AJUSTE"))
-                .andExpect(jsonPath("$.balance").value(520.0));
+                .andExpect(jsonPath("$.movementType").value("DEPOSITO"))
+                .andExpect(jsonPath("$.balance").value(680.0));
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBalance").value(680.0));
 
         mockMvc.perform(delete("/movimientos/{id}", movementId))
                 .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/cuentas/{id}", accountId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBalance").value(640.0));
 
         mockMvc.perform(delete("/cuentas/{id}", accountId))
                 .andExpect(status().isNoContent());
