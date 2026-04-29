@@ -42,4 +42,8 @@ public class Customer extends Person {
     public void setStatus(Boolean status) {
         this.status = status;
     }
+
+    public boolean isActive() {
+        return Boolean.TRUE.equals(status);
+    }
 }
