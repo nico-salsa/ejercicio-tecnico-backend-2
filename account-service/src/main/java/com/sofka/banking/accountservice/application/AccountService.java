@@ -3,11 +3,17 @@ package com.sofka.banking.accountservice.application;
 import com.sofka.banking.accountservice.api.dto.AccountCreateRequest;
 import com.sofka.banking.accountservice.api.dto.AccountPatchRequest;
 import com.sofka.banking.accountservice.api.dto.AccountResponse;
+import com.sofka.banking.accountservice.api.dto.AccountStatementReportRowResponse;
 import com.sofka.banking.accountservice.api.dto.AccountUpdateRequest;
+import com.sofka.banking.accountservice.domain.exception.InvalidReportQueryException;
 import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundException;
 import com.sofka.banking.accountservice.domain.model.Account;
+import com.sofka.banking.accountservice.domain.model.Movement;
 import com.sofka.banking.accountservice.infrastructure.persistence.AccountRepository;
+import com.sofka.banking.accountservice.infrastructure.persistence.MovementRepository;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final MovementRepository movementRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, MovementRepository movementRepository) {
         this.accountRepository = accountRepository;
+        this.movementRepository = movementRepository;
     }
 
     @Transactional(readOnly = true)
@@ -33,6 +41,26 @@ public class AccountService {
     @Transactional(readOnly = true)
     public AccountResponse findById(Long id) {
         return toResponse(loadAccount(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountStatementReportRowResponse> generateReport(String customerId, LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new InvalidReportQueryException("fechaInicio no puede ser posterior a fechaFin");
+        }
+
+        LocalDateTime startInclusive = startDate.atStartOfDay();
+        LocalDateTime endExclusive = endDate.plusDays(1).atStartOfDay();
+
+        return movementRepository
+                .findByAccountCustomerIdAndMovementDateGreaterThanEqualAndMovementDateLessThanOrderByMovementDateDescIdDesc(
+                        customerId,
+                        startInclusive,
+                        endExclusive
+                )
+                .stream()
+                .map(this::toReportRow)
+                .toList();
     }
 
     public AccountResponse create(AccountCreateRequest request) {
@@ -59,6 +87,12 @@ public class AccountService {
         if (request.initialBalance() != null) {
             applyInitialBalanceChange(account, request.initialBalance());
         }
+        if (request.customerId() != null) {
+            account.setCustomerId(request.customerId());
+        }
+        if (request.customerName() != null) {
+            account.setCustomerName(request.customerName());
+        }
         if (request.status() != null) {
             account.setStatus(request.status());
         }
@@ -81,6 +115,8 @@ public class AccountService {
         account.setAccountType(request.accountType());
         account.setInitialBalance(request.initialBalance());
         account.setAvailableBalance(request.initialBalance());
+        account.setCustomerId(request.customerId());
+        account.setCustomerName(request.customerName());
         account.setStatus(request.status());
     }
 
@@ -88,6 +124,8 @@ public class AccountService {
         account.setAccountNumber(request.accountNumber());
         account.setAccountType(request.accountType());
         applyInitialBalanceChange(account, request.initialBalance());
+        account.setCustomerId(request.customerId());
+        account.setCustomerName(request.customerName());
         account.setStatus(request.status());
     }
 
@@ -102,7 +140,23 @@ public class AccountService {
                 account.getAccountType(),
                 account.getInitialBalance(),
                 account.getAvailableBalance(),
+                account.getCustomerId(),
+                account.getCustomerName(),
                 account.getStatus()
+        );
+    }
+
+    private AccountStatementReportRowResponse toReportRow(Movement movement) {
+        Account account = movement.getAccount();
+        return new AccountStatementReportRowResponse(
+                movement.getMovementDate().toLocalDate(),
+                account.getCustomerName(),
+                account.getAccountNumber(),
+                account.getAccountType(),
+                account.getInitialBalance(),
+                account.getStatus(),
+                movement.getAmount(),
+                movement.getBalance()
         );
     }
 
