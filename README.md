@@ -205,6 +205,19 @@ cd ..\account-service
 - Cada movimiento persiste su `balance` como saldo resultante posterior a la transacción.
 - El cliente ya no debe enviar `balance` como fuente de verdad para `POST /movimientos`.
 
+ - Si un retiro o una actualizaciÃ³n de movimiento deja el saldo resultante por debajo de cero, la API responde `400 Bad Request`.
+ - El body esperado para ese caso es:
+
+```json
+{
+  "message": "Saldo no disponible",
+  "error": "INSUFFICIENT_BALANCE",
+  "status": 400
+}
+```
+
+ - Cuando la operaciÃ³n es rechazada por saldo insuficiente, no se persiste el movimiento ni se modifica `availableBalance`.
+
 ## Estado actual
 
 - Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
