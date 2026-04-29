@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get Account Statement Report
+method: GET
+url: '{{accountServiceUrl}}/reportes?clienteId={{customerBusinessId}}&fechaInicio=2022-02-01&fechaFin=2022-02-10'
+order: 7000

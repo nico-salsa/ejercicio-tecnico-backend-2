@@ -4,6 +4,8 @@ description: CRUD operations for the Account microservice (/cuentas and /movimie
 variables:
   - key: accountServiceUrl
     value: 'http://localhost:8082'
+  - key: customerBusinessId
+    value: 'MM001'
   - key: accountId
     value: '1'
   - key: movementId
