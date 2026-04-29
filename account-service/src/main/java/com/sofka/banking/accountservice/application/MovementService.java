@@ -8,6 +8,7 @@ import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundExcepti
 import com.sofka.banking.accountservice.domain.model.Account;
 import com.sofka.banking.accountservice.domain.model.Movement;
 import com.sofka.banking.accountservice.infrastructure.persistence.MovementRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,17 +41,23 @@ public class MovementService {
     public MovementResponse create(MovementCreateRequest request) {
         Movement movement = new Movement();
         applyCreate(movement, request);
-        return toResponse(movementRepository.save(movement));
+        Movement savedMovement = movementRepository.save(movement);
+        recalculateAccountBalances(savedMovement.getAccount());
+        return toResponse(savedMovement);
     }
 
     public MovementResponse update(Long id, MovementUpdateRequest request) {
         Movement movement = loadMovement(id);
+        Account originalAccount = movement.getAccount();
         applyUpdate(movement, request);
-        return toResponse(movementRepository.save(movement));
+        Movement savedMovement = movementRepository.save(movement);
+        recalculateAffectedAccounts(originalAccount, savedMovement.getAccount());
+        return toResponse(savedMovement);
     }
 
     public MovementResponse patch(Long id, MovementPatchRequest request) {
         Movement movement = loadMovement(id);
+        Account originalAccount = movement.getAccount();
 
         if (request.movementDate() != null) {
             movement.setMovementDate(request.movementDate());
@@ -61,19 +68,20 @@ public class MovementService {
         if (request.amount() != null) {
             movement.setAmount(request.amount());
         }
-        if (request.balance() != null) {
-            movement.setBalance(request.balance());
-        }
         if (request.accountId() != null) {
             movement.setAccount(accountService.loadAccount(request.accountId()));
         }
 
-        return toResponse(movementRepository.save(movement));
+        Movement savedMovement = movementRepository.save(movement);
+        recalculateAffectedAccounts(originalAccount, savedMovement.getAccount());
+        return toResponse(savedMovement);
     }
 
     public void delete(Long id) {
         Movement movement = loadMovement(id);
+        Account account = movement.getAccount();
         movementRepository.delete(movement);
+        recalculateAccountBalances(account);
     }
 
     private Movement loadMovement(Long id) {
@@ -84,18 +92,17 @@ public class MovementService {
     private void applyCreate(Movement movement, MovementCreateRequest request) {
         Account account = accountService.loadAccount(request.accountId());
         movement.setMovementDate(request.movementDate());
-        movement.setMovementType(request.movementType());
         movement.setAmount(request.amount());
-        movement.setBalance(request.balance());
+        movement.setMovementType(resolveMovementType(request.movementType(), request.amount()));
+        movement.setBalance(BigDecimal.ZERO);
         movement.setAccount(account);
     }
 
     private void applyUpdate(Movement movement, MovementUpdateRequest request) {
         Account account = accountService.loadAccount(request.accountId());
         movement.setMovementDate(request.movementDate());
-        movement.setMovementType(request.movementType());
         movement.setAmount(request.amount());
-        movement.setBalance(request.balance());
+        movement.setMovementType(resolveMovementType(request.movementType(), request.amount()));
         movement.setAccount(account);
     }
 
@@ -109,5 +116,42 @@ public class MovementService {
                 movement.getAccount().getId(),
                 movement.getAccount().getAccountNumber()
         );
+    }
+
+    private void recalculateAffectedAccounts(Account originalAccount, Account updatedAccount) {
+        recalculateAccountBalances(updatedAccount);
+
+        if (!originalAccount.getId().equals(updatedAccount.getId())) {
+            recalculateAccountBalances(originalAccount);
+        }
+    }
+
+    private void recalculateAccountBalances(Account accountReference) {
+        Account account = accountService.loadAccount(accountReference.getId());
+        List<Movement> movements = movementRepository.findByAccountIdOrderByMovementDateAscIdAsc(account.getId());
+        BigDecimal runningBalance = account.getInitialBalance();
+
+        for (Movement movement : movements) {
+            movement.setMovementType(resolveMovementType(movement.getMovementType(), movement.getAmount()));
+            runningBalance = runningBalance.add(movement.getAmount());
+            movement.setBalance(runningBalance);
+        }
+
+        movementRepository.saveAll(movements);
+        account.setAvailableBalance(runningBalance);
+        accountService.persist(account);
+    }
+
+    private String resolveMovementType(String requestedType, BigDecimal amount) {
+        if (amount.signum() > 0) {
+            return "DEPOSITO";
+        }
+        if (amount.signum() < 0) {
+            return "RETIRO";
+        }
+        if (requestedType == null || requestedType.isBlank()) {
+            return "AJUSTE";
+        }
+        return requestedType.trim().toUpperCase();
     }
 }

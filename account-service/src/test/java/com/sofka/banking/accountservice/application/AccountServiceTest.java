@@ -38,6 +38,7 @@ class AccountServiceTest {
         account.setAccountNumber("478758");
         account.setAccountType("Ahorro");
         account.setInitialBalance(new BigDecimal("2000.00"));
+        account.setAvailableBalance(new BigDecimal("2000.00"));
         account.setStatus(true);
     }
 
@@ -56,6 +57,7 @@ class AccountServiceTest {
 
         assertThat(response.accountNumber()).isEqualTo("478758");
         assertThat(response.initialBalance()).isEqualByComparingTo("2000.00");
+        assertThat(response.availableBalance()).isEqualByComparingTo("2000.00");
     }
 
     @Test
@@ -88,6 +90,7 @@ class AccountServiceTest {
         assertThat(response.accountNumber()).isEqualTo("585545");
         assertThat(response.accountType()).isEqualTo("Corriente");
         assertThat(response.initialBalance()).isEqualByComparingTo("1000.00");
+        assertThat(response.availableBalance()).isEqualByComparingTo("1000.00");
     }
 
     @Test

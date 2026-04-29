@@ -7,6 +7,7 @@ public record AccountResponse(
         String accountNumber,
         String accountType,
         BigDecimal initialBalance,
+        BigDecimal availableBalance,
         Boolean status
 ) {
 }

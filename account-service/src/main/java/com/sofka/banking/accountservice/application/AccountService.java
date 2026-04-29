@@ -7,6 +7,7 @@ import com.sofka.banking.accountservice.api.dto.AccountUpdateRequest;
 import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundException;
 import com.sofka.banking.accountservice.domain.model.Account;
 import com.sofka.banking.accountservice.infrastructure.persistence.AccountRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +57,7 @@ public class AccountService {
             account.setAccountType(request.accountType());
         }
         if (request.initialBalance() != null) {
-            account.setInitialBalance(request.initialBalance());
+            applyInitialBalanceChange(account, request.initialBalance());
         }
         if (request.status() != null) {
             account.setStatus(request.status());
@@ -79,14 +80,19 @@ public class AccountService {
         account.setAccountNumber(request.accountNumber());
         account.setAccountType(request.accountType());
         account.setInitialBalance(request.initialBalance());
+        account.setAvailableBalance(request.initialBalance());
         account.setStatus(request.status());
     }
 
     private void applyUpdate(Account account, AccountUpdateRequest request) {
         account.setAccountNumber(request.accountNumber());
         account.setAccountType(request.accountType());
-        account.setInitialBalance(request.initialBalance());
+        applyInitialBalanceChange(account, request.initialBalance());
         account.setStatus(request.status());
+    }
+
+    Account persist(Account account) {
+        return accountRepository.save(account);
     }
 
     private AccountResponse toResponse(Account account) {
@@ -95,7 +101,20 @@ public class AccountService {
                 account.getAccountNumber(),
                 account.getAccountType(),
                 account.getInitialBalance(),
+                account.getAvailableBalance(),
                 account.getStatus()
         );
+    }
+
+    private void applyInitialBalanceChange(Account account, BigDecimal newInitialBalance) {
+        if (account.getAvailableBalance() == null || account.getInitialBalance() == null) {
+            account.setInitialBalance(newInitialBalance);
+            account.setAvailableBalance(newInitialBalance);
+            return;
+        }
+
+        BigDecimal delta = newInitialBalance.subtract(account.getInitialBalance());
+        account.setInitialBalance(newInitialBalance);
+        account.setAvailableBalance(account.getAvailableBalance().add(delta));
     }
 }
