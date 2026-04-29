@@ -1,0 +1,17 @@
+$kind: http-request
+name: Create Movement - Insufficient Balance
+method: POST
+url: '{{accountServiceUrl}}/movimientos'
+order: 3100
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "movementDate": "2024-01-15T10:30:00",
+      "movementType": "RETIRO",
+      "amount": -99999.00,
+      "accountId": {{accountId}}
+    }

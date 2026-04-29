@@ -1,0 +1,14 @@
+$kind: http-request
+name: Patch Movement - Insufficient Balance
+method: PATCH
+url: '{{accountServiceUrl}}/movimientos/{{movementId}}'
+order: 5100
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "amount": -99999.00
+    }
