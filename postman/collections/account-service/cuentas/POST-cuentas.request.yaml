@@ -1,0 +1,17 @@
+$kind: http-request
+name: Create Account
+method: POST
+url: '{{accountServiceUrl}}/cuentas'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "accountNumber": "478758",
+      "accountType": "Ahorro",
+      "initialBalance": 2000.00,
+      "status": true
+    }

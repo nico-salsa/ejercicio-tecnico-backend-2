@@ -1,0 +1,17 @@
+$kind: http-request
+name: 'Update Movement (Full)'
+method: PUT
+url: '{{accountServiceUrl}}/movimientos/{{movementId}}'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "movementDate": "2024-01-15T10:30:00",
+      "movementType": "RETIRO",
+      "amount": -575.00,
+      "accountId": {{accountId}}
+    }

@@ -1,0 +1,15 @@
+$kind: http-request
+name: 'Patch Customer (Partial)'
+method: PATCH
+url: '{{customerServiceUrl}}/clientes/{{customerResourceId}}'
+order: 5000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "status": false,
+      "phone": "099999999"
+    }

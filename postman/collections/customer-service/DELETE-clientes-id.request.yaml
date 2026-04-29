@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete Customer
+method: DELETE
+url: '{{customerServiceUrl}}/clientes/{{customerResourceId}}'
+order: 6000

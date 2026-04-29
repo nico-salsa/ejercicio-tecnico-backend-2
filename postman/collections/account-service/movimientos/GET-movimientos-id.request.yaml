@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get Movement by ID
+method: GET
+url: '{{accountServiceUrl}}/movimientos/{{movementId}}'
+order: 2000
