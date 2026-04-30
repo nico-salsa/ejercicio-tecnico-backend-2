@@ -1,94 +1,97 @@
 # ejercicio-tecnico-backend-2
 
-Backend bancario en monorepo con dos microservicios Spring Boot.
+Backend bancario en monorepo con dos microservicios Spring Boot:
 
-## Contexto base
+- `customer-service`
+- `account-service`
 
-- Backend en Java Spring Boot.
-- Arquitectura de 2 microservicios.
-- Base de datos relacional.
-- Postman v9.13.2 como validador de API.
+Este repositorio ya contiene:
 
-## Reglas de trabajo
+- CRUD de clientes, cuentas y movimientos
+- reglas de saldo disponible y saldo insuficiente
+- reporte de estado de cuenta por cliente y rango de fechas
+- pruebas unitarias, pruebas de integracion y CI con cobertura
+- despliegue con Docker Compose
+- script `BaseDatos.sql`
+- coleccion Postman JSON para validar endpoints
 
-- Se usará git flow.
-- `main` será la rama protegida de producción.
-- `develop` será la rama de integración.
-- El trabajo funcional se hará en ramas `feature/*` creadas desde `develop`.
-- La rama `main` deberá permanecer protegida y solo aceptar cambios mediante merge revisado.
-- Los commits deben seguir conventional commits en español.
-- Los commits deben ser extremadamente atómicos para facilitar revisión previa al merge.
-- Por cada commit se debe realizar su `push` correspondiente.
+## Repositorio publico
+
+Ruta del repositorio:
+
+- `https://github.com/nico-salsa/ejercicio-tecnico-backend-2`
+
+## Stack
+
+- Java 17
+- Spring Boot 3
+- Spring Data JPA
+- PostgreSQL 17
+- JUnit 5
+- Mockito
+- Docker
+- Docker Compose
+- Postman
 
 ## Arquitectura
 
-- El repositorio se organiza como monorepo con dos aplicaciones Spring Boot independientes:
-  - `customer-service`
-  - `account-service`
-- Cada servicio mantiene una estructura simple por capas:
-  - `api`
-  - `application`
-  - `domain`
-  - `infrastructure`
-- La explicación funcional y arquitectónica debe vivir en este `README.md`.
-- Los comentarios en código fuente deben usarse solo cuando mejoren legibilidad de un bloque que no se explique bien por nombres y estructura.
-
-## Estructura
-
-```text
-.
-├── .github/
-├── customer-service/
-└── account-service/
-```
-
-## Microservicios
-
 ### customer-service
 
-- Responsable de `Persona` y `Cliente`.
-- Puerto por defecto: `8081`.
-- Base de datos por defecto: `customer_service`.
-- Variables de entorno:
-  - `CUSTOMER_SERVICE_PORT`
-  - `CUSTOMER_SERVICE_DB_URL`
-  - `CUSTOMER_SERVICE_DB_USERNAME`
-  - `CUSTOMER_SERVICE_DB_PASSWORD`
-- Endpoints:
-  - `GET /clientes`
-  - `GET /clientes/{id}`
-  - `POST /clientes`
-  - `PUT /clientes/{id}`
-  - `PATCH /clientes/{id}`
-  - `DELETE /clientes/{id}`
+Responsable de:
+
+- Persona
+- Cliente
+
+Puerto:
+
+- `8081`
+
+Base de datos:
+
+- `customer_service`
+
+Endpoints:
+
+- `GET /clientes`
+- `GET /clientes/{id}`
+- `POST /clientes`
+- `PUT /clientes/{id}`
+- `PATCH /clientes/{id}`
+- `DELETE /clientes/{id}`
 
 ### account-service
 
-- Responsable de `Cuenta` y `Movimiento`.
-- Puerto por defecto: `8082`.
-- Base de datos por defecto: `account_service`.
-- Variables de entorno:
-  - `ACCOUNT_SERVICE_PORT`
-  - `ACCOUNT_SERVICE_DB_URL`
-  - `ACCOUNT_SERVICE_DB_USERNAME`
-  - `ACCOUNT_SERVICE_DB_PASSWORD`
-- Endpoints de cuentas:
-  - `GET /cuentas`
-  - `GET /cuentas/{id}`
-  - `POST /cuentas`
-  - `PUT /cuentas/{id}`
-  - `PATCH /cuentas/{id}`
-  - `DELETE /cuentas/{id}`
-- Endpoints de movimientos:
-  - `GET /movimientos`
-  - `GET /movimientos/{id}`
-  - `POST /movimientos`
-  - `PUT /movimientos/{id}`
-  - `PATCH /movimientos/{id}`
-  - `DELETE /movimientos/{id}`
-  - `GET /reportes?clienteId={clienteId}&fechaInicio={yyyy-MM-dd}&fechaFin={yyyy-MM-dd}`
+Responsable de:
 
-## Modelo inicial
+- Cuenta
+- Movimiento
+- Reporte de estado de cuenta
+
+Puerto:
+
+- `8082`
+
+Base de datos:
+
+- `account_service`
+
+Endpoints:
+
+- `GET /cuentas`
+- `GET /cuentas/{id}`
+- `POST /cuentas`
+- `PUT /cuentas/{id}`
+- `PATCH /cuentas/{id}`
+- `DELETE /cuentas/{id}`
+- `GET /movimientos`
+- `GET /movimientos/{id}`
+- `POST /movimientos`
+- `PUT /movimientos/{id}`
+- `PATCH /movimientos/{id}`
+- `DELETE /movimientos/{id}`
+- `GET /reportes?clienteId={clienteId}&fechaInicio={yyyy-MM-dd}&fechaFin={yyyy-MM-dd}`
+
+## Modelo implementado
 
 ### Persona
 
@@ -113,6 +116,7 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
 - `accountNumber`
 - `accountType`
 - `initialBalance`
+- `availableBalance`
 - `customerId`
 - `customerName`
 - `status`
@@ -126,94 +130,227 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
 - `balance`
 - `accountId`
 
-## Ejecución local
+## Entregables incluidos
 
-### customer-service
+### 1. Script de base de datos
+
+Archivo:
+
+- [BaseDatos.sql](BaseDatos.sql)
+
+Contiene:
+
+- creacion de `customer_service`
+- creacion de `account_service`
+- esquema de tablas
+- relaciones
+- datos semilla alineados con los casos de uso del enunciado
+
+### 2. Coleccion Postman JSON
+
+Archivo:
+
+- [postman/export/ejercicio-tecnico-backend-2.postman_collection.json](postman/export/ejercicio-tecnico-backend-2.postman_collection.json)
+
+Incluye requests para:
+
+- clientes
+- cuentas
+- movimientos
+- saldo insuficiente
+- reportes
+
+### 3. Contenerizacion
+
+Archivos:
+
+- [customer-service/Dockerfile](customer-service/Dockerfile)
+- [account-service/Dockerfile](account-service/Dockerfile)
+- [docker-compose.yml](docker-compose.yml)
+
+## Forma recomendada de ejecucion desde cero
+
+Si vas a clonar este repositorio en otra maquina y quieres levantar todo con el menor esfuerzo posible, usa Docker Compose.
+
+### Requisitos minimos
+
+Instala:
+
+- Git
+- Docker Desktop
+
+No necesitas instalar Java ni PostgreSQL si usas Docker Compose.
+
+### Paso a paso con Docker
+
+1. Clona el repositorio:
 
 ```powershell
+git clone https://github.com/nico-salsa/ejercicio-tecnico-backend-2.git
+cd ejercicio-tecnico-backend-2
+```
+
+2. Construye y levanta todo:
+
+```powershell
+docker compose up --build
+```
+
+3. Espera a que los tres contenedores queden arriba:
+
+- `banking-postgres`
+- `customer-service`
+- `account-service`
+
+4. Verifica que los servicios respondan:
+
+```powershell
+curl http://localhost:8081/clientes
+curl http://localhost:8082/cuentas
+```
+
+5. Para detenerlos:
+
+```powershell
+docker compose down
+```
+
+6. Si quieres reinicializar completamente la base y volver a ejecutar `BaseDatos.sql` desde cero:
+
+```powershell
+docker compose down -v
+docker compose up --build
+```
+
+`-v` elimina el volumen de PostgreSQL. Sin eso, los datos persisten.
+
+## Que hace Docker Compose
+
+- levanta PostgreSQL 17 en `localhost:5432`
+- monta `BaseDatos.sql` como script de inicializacion
+- crea y arranca `customer-service`
+- crea y arranca `account-service`
+
+Credenciales por defecto usadas por Compose:
+
+- usuario: `postgres`
+- password: `postgres`
+
+## Forma alternativa de ejecucion local
+
+Usa esta opcion solo si prefieres correr los servicios fuera de Docker.
+
+### Requisitos
+
+Instala:
+
+- Java 17
+- PostgreSQL 17
+
+### Crear bases con el script
+
+1. Abre `psql`:
+
+```powershell
+& "C:\Program Files\PostgreSQL\17\bin\psql.exe" -U postgres -h localhost -p 5432 -d postgres
+```
+
+2. Ejecuta el script:
+
+```sql
+\i C:/ruta/completa/ejercicio-tecnico-backend-2/BaseDatos.sql
+```
+
+3. Sal de `psql`:
+
+```sql
+\q
+```
+
+### Levantar customer-service
+
+```powershell
+$env:CUSTOMER_SERVICE_DB_URL="jdbc:postgresql://localhost:5432/customer_service"
+$env:CUSTOMER_SERVICE_DB_USERNAME="postgres"
+$env:CUSTOMER_SERVICE_DB_PASSWORD="TU_PASSWORD"
 cd customer-service
 .\mvnw.cmd spring-boot:run
 ```
 
-### account-service
+### Levantar account-service
 
 ```powershell
+$env:ACCOUNT_SERVICE_DB_URL="jdbc:postgresql://localhost:5432/account_service"
+$env:ACCOUNT_SERVICE_DB_USERNAME="postgres"
+$env:ACCOUNT_SERVICE_DB_PASSWORD="TU_PASSWORD"
 cd account-service
 .\mvnw.cmd spring-boot:run
 ```
 
-## Validación local
+## Como importar y usar Postman
 
-```powershell
-cd customer-service
-.\mvnw.cmd verify
+### Importar la coleccion
 
-cd ..\account-service
-.\mvnw.cmd verify
-```
+1. Abre Postman.
+2. Usa `Import`.
+3. Selecciona:
 
-## CI
+- `postman/export/ejercicio-tecnico-backend-2.postman_collection.json`
 
-- El pipeline de CI vive en `.github/workflows/ci.yml`.
-- Los checks esperados para el ruleset son:
-  - `repository-validation`
-  - `java-validation`
-  - `container-validation`
-- El workflow corre en `pull_request` hacia `develop` y `main`.
-- El workflow corre en `push` sobre `feature/*`, `develop` y `main`.
-- En el estado actual del repositorio, `container-validation` está diseñado para omitir su ejecución si todavía no existen Dockerfiles o `docker-compose.yml`.
-- El check `java-validation` ejecuta `./mvnw -B verify` por módulo.
-- `verify` compila, ejecuta pruebas unitarias e integración y valida cobertura con JaCoCo.
-- Cada microservicio exige una cobertura mínima de líneas superior al 80%.
-- Si falla alguna prueba o la cobertura queda por debajo del umbral, el pipeline falla.
-- Cuando existan Dockerfiles y `docker-compose.yml`, el check `container-validation` validará build de imágenes y sintaxis de compose.
+### Variables que usa la coleccion
 
-## Pruebas y cobertura
+La coleccion trae estas variables:
 
-- `customer-service` incluye pruebas unitarias de servicio y pruebas de integración HTTP/JPA para `/clientes`.
-- `account-service` incluye pruebas unitarias de servicio y pruebas de integración HTTP/JPA para `/cuentas` y `/movimientos`.
-- Ambos módulos validan escenarios felices y no felices de recurso inexistente, payload inválido y manejo de errores.
-- Los reportes HTML de cobertura se generan en:
-  - `customer-service/target/site/jacoco/index.html`
-  - `account-service/target/site/jacoco/index.html`
+- `customerServiceUrl` = `http://localhost:8081`
+- `accountServiceUrl` = `http://localhost:8082`
+- `customerResourceId` = `1`
+- `customerBusinessId` = `MM001`
+- `accountId` = `1`
+- `movementId` = `1`
 
-La evidencia automatizada de F6 en `account-service` es la prueba `shouldCoverF6WithEndToEndBankingFlow`, que valida por HTTP la creacion de cuenta, el registro de movimiento y la verificacion del resultado observable final.
+Puedes editarlas directamente en la coleccion o usar un environment propio.
 
-## Postman
+## Flujo recomendado de validacion manual
 
-- La colección editable del proyecto vive en `postman/`.
-- `.postman/` es metadata local del cliente de Postman y no forma parte del entregable del repositorio.
-- El environment local base es `postman/environments/local.environment.yaml`.
-- Variables principales:
-  - `customerServiceUrl`: `http://localhost:8081`
-  - `accountServiceUrl`: `http://localhost:8082`
-  - `customerResourceId`: id numérico interno de `/clientes/{id}`
-  - `accountId`: id numérico interno de `/cuentas/{id}`
-  - `movementId`: id numérico interno de `/movimientos/{id}`
-- `customerResourceId` no es lo mismo que el campo de negocio `customerId`.
-- Flujo recomendado de prueba manual:
-  - ejecutar `POST /clientes` y copiar el `id` devuelto en `customerResourceId`
-  - ejecutar `POST /cuentas` enviando `customerId` y `customerName`, y copiar el `id` devuelto en `accountId`
-  - ejecutar `POST /movimientos` usando ese `accountId`
-  - ejecutar `GET /reportes` usando `customerBusinessId` y el rango de fechas deseado
-  - usar luego los requests `GET`, `PUT`, `PATCH` y `DELETE` sobre esos ids
-- La colección actual está alineada con los endpoints reales implementados:
-  - `GET|POST|PUT|PATCH|DELETE /clientes`
-  - `GET|POST|PUT|PATCH|DELETE /cuentas`
-  - `GET|POST|PUT|PATCH|DELETE /movimientos`
-  - `GET /reportes`
+Este es el flujo mas util para validar el backend.
 
-## Movimientos y saldo
+### 1. Clientes
 
-- `account-service` calcula internamente el saldo resultante de cada movimiento.
-- Un valor positivo en `amount` representa un depósito.
-- Un valor negativo en `amount` representa un retiro.
-- La cuenta mantiene `availableBalance` como saldo disponible actual persistido.
-- Cada movimiento persiste su `balance` como saldo resultante posterior a la transacción.
-- El cliente ya no debe enviar `balance` como fuente de verdad para `POST /movimientos`.
+Ejecuta:
 
- - Si un retiro o una actualizaciÃ³n de movimiento deja el saldo resultante por debajo de cero, la API responde `400 Bad Request`.
- - El body esperado para ese caso es:
+- `POST /clientes`
+- `GET /clientes`
+- `GET /clientes/{id}`
+
+Si creas un cliente nuevo, copia el `id` devuelto y actualiza `customerResourceId`.
+
+### 2. Cuentas
+
+Ejecuta:
+
+- `POST /cuentas`
+- `GET /cuentas`
+- `GET /cuentas/{id}`
+
+Si creas una cuenta nueva, copia el `id` devuelto y actualiza `accountId`.
+
+### 3. Movimientos
+
+Ejecuta:
+
+- `POST /movimientos`
+- `GET /movimientos`
+- `GET /movimientos/{id}`
+
+Si creas un movimiento nuevo, copia el `id` devuelto y actualiza `movementId`.
+
+### 4. Saldo insuficiente
+
+Ejecuta:
+
+- `POST /movimientos saldo insuficiente`
+
+Respuesta esperada:
 
 ```json
 {
@@ -223,19 +360,87 @@ La evidencia automatizada de F6 en `account-service` es la prueba `shouldCoverF6
 }
 ```
 
- - Cuando la operaciÃ³n es rechazada por saldo insuficiente, no se persiste el movimiento ni se modifica `availableBalance`.
+### 5. Reporte
 
-## Reportes
+Ejecuta:
 
-- `account-service` expone `GET /reportes?clienteId={clienteId}&fechaInicio={yyyy-MM-dd}&fechaFin={yyyy-MM-dd}`.
-- El reporte retorna una lista JSON plana, una fila por movimiento dentro del rango consultado.
-- Cada fila incluye `fecha`, `cliente`, `numeroCuenta`, `tipo`, `saldoInicial`, `estado`, `movimiento` y `saldoDisponible`.
-- El filtro usa `customerId` como identificador de negocio del cliente.
-- Si no hay movimientos en el rango, la API responde `200` con lista vacia.
-- Si `fechaInicio` es posterior a `fechaFin`, la API responde `400` con error `REPORT_QUERY_INVALID`.
+- `GET /reportes`
 
-## Estado actual
+Con los datos semilla, el reporte de `MM001` entre `2022-02-01` y `2022-02-10` debe reflejar los movimientos de Marianela Montalvo.
 
-- Ya existe pipeline de CI para validar estructura, módulos Java y artefactos de contenedores.
-- La primera funcionalidad implementada es el CRUD base para `clientes`, `cuentas` y `movimientos`.
-- El repositorio ya exige pruebas automatizadas y cobertura mínima por módulo para sostener la calidad del backend.
+## Casos de uso cargados en BaseDatos.sql
+
+### Clientes base
+
+- Jose Lema
+- Marianela Montalvo
+- Juan Osorio
+
+### Cuentas base
+
+- `478758` Ahorro, Jose Lema, saldo inicial `2000`
+- `225487` Corriente, Marianela Montalvo, saldo inicial `100`
+- `495878` Ahorros, Juan Osorio, saldo inicial `0`
+- `496825` Ahorros, Marianela Montalvo, saldo inicial `540`
+- `585545` Corriente, Jose Lema, saldo inicial `1000`
+
+### Movimientos base
+
+- `478758` retiro `-575`, saldo `1425`
+- `225487` deposito `600`, saldo `700`
+- `495878` deposito `150`, saldo `150`
+- `496825` retiro `-540`, saldo `0`
+
+## Pruebas automatizadas
+
+### customer-service
+
+```powershell
+cd customer-service
+.\mvnw.cmd -B verify
+```
+
+### account-service
+
+```powershell
+cd account-service
+.\mvnw.cmd -B verify
+```
+
+### Lo que valida la suite
+
+- CRUD de clientes
+- CRUD de cuentas
+- CRUD de movimientos
+- regla de saldo disponible
+- error de saldo insuficiente
+- reporte de estado de cuenta
+- prueba unitaria de dominio para `Customer`
+- prueba de integracion explicita para F6
+
+## CI
+
+El pipeline de GitHub Actions valida:
+
+- estructura del repositorio
+- build Java
+- pruebas
+- cobertura minima por modulo
+
+## Git flow del proyecto
+
+- `main`: rama protegida
+- `develop`: rama de integracion
+- `feature/*`: ramas de trabajo
+
+Convenciones:
+
+- commits en espanol con conventional commits
+- commits atomicos
+- push inmediato por commit
+
+## Observaciones finales
+
+- No se cambiaron las rutas actuales de los endpoints.
+- El flujo principal recomendado para evaluacion es con Docker Compose.
+- Si vas a usar una maquina nueva, sigue primero la seccion `Forma recomendada de ejecucion desde cero`.

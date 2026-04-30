@@ -42,10 +42,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q "git flow" README.md
-          grep -q "develop" README.md
-          grep -q "feature/" README.md
-          grep -q "push" README.md
+          grep -qi "git flow" README.md
+          grep -qi "develop" README.md
+          grep -qi "feature/" README.md
+          grep -qi "push" README.md
 
   java-validation:
     name: java-validation
@@ -156,7 +156,7 @@ jobs:
           for dockerfile in "${dockerfiles[@]}"; do
             [[ -z "$dockerfile" ]] && continue
             context_dir=$(dirname "$dockerfile")
-            tag_name=$(echo "$dockerfile" | tr '/.' '-')
+            tag_name=$(echo "$dockerfile" | tr '[:upper:]' '[:lower:]' | tr '/.' '-')
             echo "Validating Dockerfile $dockerfile with context $context_dir"
             docker build --file "$dockerfile" --tag "ci-$tag_name" "$context_dir"
           done
