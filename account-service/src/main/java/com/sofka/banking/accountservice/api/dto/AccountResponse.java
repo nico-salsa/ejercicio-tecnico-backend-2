@@ -8,6 +8,8 @@ public record AccountResponse(
         String accountType,
         BigDecimal initialBalance,
         BigDecimal availableBalance,
+        String customerId,
+        String customerName,
         Boolean status
 ) {
 }

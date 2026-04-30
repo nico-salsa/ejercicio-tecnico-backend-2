@@ -86,6 +86,7 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
   - `PUT /movimientos/{id}`
   - `PATCH /movimientos/{id}`
   - `DELETE /movimientos/{id}`
+  - `GET /reportes?clienteId={clienteId}&fechaInicio={yyyy-MM-dd}&fechaFin={yyyy-MM-dd}`
 
 ## Modelo inicial
 
@@ -112,6 +113,8 @@ Backend bancario en monorepo con dos microservicios Spring Boot.
 - `accountNumber`
 - `accountType`
 - `initialBalance`
+- `customerId`
+- `customerName`
 - `status`
 
 ### Movimiento
@@ -174,6 +177,8 @@ cd ..\account-service
   - `customer-service/target/site/jacoco/index.html`
   - `account-service/target/site/jacoco/index.html`
 
+La evidencia automatizada de F6 en `account-service` es la prueba `shouldCoverF6WithEndToEndBankingFlow`, que valida por HTTP la creacion de cuenta, el registro de movimiento y la verificacion del resultado observable final.
+
 ## Postman
 
 - La colección editable del proyecto vive en `postman/`.
@@ -188,13 +193,15 @@ cd ..\account-service
 - `customerResourceId` no es lo mismo que el campo de negocio `customerId`.
 - Flujo recomendado de prueba manual:
   - ejecutar `POST /clientes` y copiar el `id` devuelto en `customerResourceId`
-  - ejecutar `POST /cuentas` y copiar el `id` devuelto en `accountId`
+  - ejecutar `POST /cuentas` enviando `customerId` y `customerName`, y copiar el `id` devuelto en `accountId`
   - ejecutar `POST /movimientos` usando ese `accountId`
+  - ejecutar `GET /reportes` usando `customerBusinessId` y el rango de fechas deseado
   - usar luego los requests `GET`, `PUT`, `PATCH` y `DELETE` sobre esos ids
 - La colección actual está alineada con los endpoints reales implementados:
   - `GET|POST|PUT|PATCH|DELETE /clientes`
   - `GET|POST|PUT|PATCH|DELETE /cuentas`
   - `GET|POST|PUT|PATCH|DELETE /movimientos`
+  - `GET /reportes`
 
 ## Movimientos y saldo
 
@@ -217,6 +224,15 @@ cd ..\account-service
 ```
 
  - Cuando la operaciÃ³n es rechazada por saldo insuficiente, no se persiste el movimiento ni se modifica `availableBalance`.
+
+## Reportes
+
+- `account-service` expone `GET /reportes?clienteId={clienteId}&fechaInicio={yyyy-MM-dd}&fechaFin={yyyy-MM-dd}`.
+- El reporte retorna una lista JSON plana, una fila por movimiento dentro del rango consultado.
+- Cada fila incluye `fecha`, `cliente`, `numeroCuenta`, `tipo`, `saldoInicial`, `estado`, `movimiento` y `saldoDisponible`.
+- El filtro usa `customerId` como identificador de negocio del cliente.
+- Si no hay movimientos en el rango, la API responde `200` con lista vacia.
+- Si `fechaInicio` es posterior a `fechaFin`, la API responde `400` con error `REPORT_QUERY_INVALID`.
 
 ## Estado actual
 

@@ -1,6 +1,7 @@
 package com.sofka.banking.accountservice.api.error;
 
 import com.sofka.banking.accountservice.domain.exception.InsufficientBalanceException;
+import com.sofka.banking.accountservice.domain.exception.InvalidReportQueryException;
 import com.sofka.banking.accountservice.domain.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -24,6 +25,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<ApiError> handleInsufficientBalance(InsufficientBalanceException exception) {
         return buildResponse(HttpStatus.BAD_REQUEST, "INSUFFICIENT_BALANCE", exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidReportQueryException.class)
+    public ResponseEntity<ApiError> handleInvalidReportQuery(InvalidReportQueryException exception) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "REPORT_QUERY_INVALID", exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

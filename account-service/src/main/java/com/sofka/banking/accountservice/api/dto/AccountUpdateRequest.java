@@ -10,6 +10,8 @@ public record AccountUpdateRequest(
         @NotBlank @Size(max = 50) String accountNumber,
         @NotBlank @Size(max = 40) String accountType,
         @NotNull @DecimalMin("0.00") BigDecimal initialBalance,
+        @NotBlank @Size(max = 50) String customerId,
+        @NotBlank @Size(max = 120) String customerName,
         @NotNull Boolean status
 ) {
 }

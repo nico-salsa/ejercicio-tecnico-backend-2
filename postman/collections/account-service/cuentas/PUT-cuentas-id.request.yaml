@@ -13,5 +13,7 @@ body:
       "accountNumber": "478758",
       "accountType": "Ahorro",
       "initialBalance": 2000.00,
+      "customerId": "{{customerBusinessId}}",
+      "customerName": "Marianela Montalvo",
       "status": true
     }

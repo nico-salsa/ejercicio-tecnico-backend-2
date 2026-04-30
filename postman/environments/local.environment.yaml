@@ -12,6 +12,10 @@ values:
     value: '1'
     enabled: true
     type: default
+  - key: customerBusinessId
+    value: 'MM001'
+    enabled: true
+    type: default
   - key: accountId
     value: '1'
     enabled: true
