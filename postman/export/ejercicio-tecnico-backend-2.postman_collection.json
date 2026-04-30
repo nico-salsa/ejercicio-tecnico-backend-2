@@ -1,0 +1,317 @@
+{
+  "info": {
+    "_postman_id": "a8820ec2-3df8-4b18-91be-8abbb15f4a55",
+    "name": "ejercicio-tecnico-backend-2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "customerServiceUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "accountServiceUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "customerResourceId",
+      "value": "1"
+    },
+    {
+      "key": "customerBusinessId",
+      "value": "MM001"
+    },
+    {
+      "key": "accountId",
+      "value": "1"
+    },
+    {
+      "key": "movementId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "customer-service",
+      "item": [
+        {
+          "name": "GET /clientes",
+          "request": {
+            "method": "GET",
+            "url": "{{customerServiceUrl}}/clientes"
+          }
+        },
+        {
+          "name": "GET /clientes/{id}",
+          "request": {
+            "method": "GET",
+            "url": "{{customerServiceUrl}}/clientes/{{customerResourceId}}"
+          }
+        },
+        {
+          "name": "POST /clientes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jose Lema\",\n  \"gender\": \"Masculino\",\n  \"age\": 30,\n  \"identification\": \"0102030405\",\n  \"address\": \"Otavalo sn y principal\",\n  \"phone\": \"098254785\",\n  \"customerId\": \"JL001\",\n  \"password\": \"1234\",\n  \"status\": true\n}"
+            },
+            "url": "{{customerServiceUrl}}/clientes"
+          }
+        },
+        {
+          "name": "PUT /clientes/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jose Lema Actualizado\",\n  \"gender\": \"Masculino\",\n  \"age\": 31,\n  \"identification\": \"0102030405\",\n  \"address\": \"Nueva direccion\",\n  \"phone\": \"098254785\",\n  \"customerId\": \"JL001\",\n  \"password\": \"1234\",\n  \"status\": true\n}"
+            },
+            "url": "{{customerServiceUrl}}/clientes/{{customerResourceId}}"
+          }
+        },
+        {
+          "name": "PATCH /clientes/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": false\n}"
+            },
+            "url": "{{customerServiceUrl}}/clientes/{{customerResourceId}}"
+          }
+        },
+        {
+          "name": "DELETE /clientes/{id}",
+          "request": {
+            "method": "DELETE",
+            "url": "{{customerServiceUrl}}/clientes/{{customerResourceId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "account-service",
+      "item": [
+        {
+          "name": "cuentas",
+          "item": [
+            {
+              "name": "GET /cuentas",
+              "request": {
+                "method": "GET",
+                "url": "{{accountServiceUrl}}/cuentas"
+              }
+            },
+            {
+              "name": "GET /cuentas/{id}",
+              "request": {
+                "method": "GET",
+                "url": "{{accountServiceUrl}}/cuentas/{{accountId}}"
+              }
+            },
+            {
+              "name": "POST /cuentas",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountNumber\": \"585545\",\n  \"accountType\": \"Corriente\",\n  \"initialBalance\": 1000.00,\n  \"customerId\": \"JL001\",\n  \"customerName\": \"Jose Lema\",\n  \"status\": true\n}"
+                },
+                "url": "{{accountServiceUrl}}/cuentas"
+              }
+            },
+            {
+              "name": "PUT /cuentas/{id}",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"accountNumber\": \"585545\",\n  \"accountType\": \"Corriente\",\n  \"initialBalance\": 1200.00,\n  \"customerId\": \"JL001\",\n  \"customerName\": \"Jose Lema\",\n  \"status\": true\n}"
+                },
+                "url": "{{accountServiceUrl}}/cuentas/{{accountId}}"
+              }
+            },
+            {
+              "name": "PATCH /cuentas/{id}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": false\n}"
+                },
+                "url": "{{accountServiceUrl}}/cuentas/{{accountId}}"
+              }
+            },
+            {
+              "name": "DELETE /cuentas/{id}",
+              "request": {
+                "method": "DELETE",
+                "url": "{{accountServiceUrl}}/cuentas/{{accountId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "movimientos",
+          "item": [
+            {
+              "name": "GET /movimientos",
+              "request": {
+                "method": "GET",
+                "url": "{{accountServiceUrl}}/movimientos"
+              }
+            },
+            {
+              "name": "GET /movimientos/{id}",
+              "request": {
+                "method": "GET",
+                "url": "{{accountServiceUrl}}/movimientos/{{movementId}}"
+              }
+            },
+            {
+              "name": "POST /movimientos",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"movementDate\": \"2022-02-10T10:00:00\",\n  \"movementType\": \"DEPOSITO\",\n  \"amount\": 600.00,\n  \"accountId\": {{accountId}}\n}"
+                },
+                "url": "{{accountServiceUrl}}/movimientos"
+              }
+            },
+            {
+              "name": "POST /movimientos saldo insuficiente",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"movementDate\": \"2022-02-10T10:00:00\",\n  \"movementType\": \"RETIRO\",\n  \"amount\": -5000.00,\n  \"accountId\": {{accountId}}\n}"
+                },
+                "url": "{{accountServiceUrl}}/movimientos"
+              }
+            },
+            {
+              "name": "PUT /movimientos/{id}",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"movementDate\": \"2022-02-10T11:00:00\",\n  \"movementType\": \"DEPOSITO\",\n  \"amount\": 700.00,\n  \"accountId\": {{accountId}}\n}"
+                },
+                "url": "{{accountServiceUrl}}/movimientos/{{movementId}}"
+              }
+            },
+            {
+              "name": "PATCH /movimientos/{id}",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 150.00\n}"
+                },
+                "url": "{{accountServiceUrl}}/movimientos/{{movementId}}"
+              }
+            },
+            {
+              "name": "PATCH /movimientos/{id} saldo insuficiente",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": -9999.00\n}"
+                },
+                "url": "{{accountServiceUrl}}/movimientos/{{movementId}}"
+              }
+            },
+            {
+              "name": "DELETE /movimientos/{id}",
+              "request": {
+                "method": "DELETE",
+                "url": "{{accountServiceUrl}}/movimientos/{{movementId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "reportes",
+          "item": [
+            {
+              "name": "GET /reportes",
+              "request": {
+                "method": "GET",
+                "url": "{{accountServiceUrl}}/reportes?clienteId={{customerBusinessId}}&fechaInicio=2022-02-01&fechaFin=2022-02-10"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
