@@ -227,9 +227,11 @@ docker compose up --build
 ## Que hace Docker Compose
 
 - levanta PostgreSQL 17 en `localhost:5432`
-- monta `BaseDatos.sql` como script de inicializacion
+- ejecuta `BaseDatos.sql` mediante un contenedor de bootstrap antes de arrancar los microservicios
 - crea y arranca `customer-service`
 - crea y arranca `account-service`
+
+El flujo de bootstrap esta pensado para tolerar mejor volumnes previos de PostgreSQL: primero asegura que existan las bases y los datos semilla, y despues levanta los microservicios.
 
 Credenciales por defecto usadas por Compose:
 
