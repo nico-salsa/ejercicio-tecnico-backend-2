@@ -233,10 +233,7 @@ docker compose up --build
 
 El flujo de bootstrap esta pensado para tolerar mejor volumnes previos de PostgreSQL: primero asegura que existan las bases y los datos semilla, y despues levanta los microservicios.
 
-Credenciales por defecto usadas por Compose:
-
-- usuario: `postgres`
-- password: `postgres`
+---
 
 ## Forma alternativa de ejecucion local
 
